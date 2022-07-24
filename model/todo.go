@@ -7,12 +7,14 @@ import (
 	"io/ioutil"
 	"os"
 	"time"
+
+	"github.com/alexeyco/simpletable"
 )
 
 type item struct {
 	Task        string
 	Done        bool
-	CreateAt    time.Time
+	CreatedAt   time.Time
 	CompletedAt time.Time
 }
 
@@ -22,7 +24,7 @@ func (t *Todos) Add(task string) {
 	todo := item{
 		Task:        task,
 		Done:        false,
-		CreateAt:    time.Now(),
+		CreatedAt:   time.Now(),
 		CompletedAt: time.Now(),
 	}
 
@@ -83,8 +85,38 @@ func (t *Todos) Store(filename string) error {
 }
 
 func (t *Todos) Print() {
-	for i, item := range *t {
-		i++
-		fmt.Printf("%d - %s\n", i, item.Task)
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "Task"},
+			{Align: simpletable.AlignCenter, Text: "Done"},
+			{Align: simpletable.AlignRight, Text: "CreatedAt"},
+			{Align: simpletable.AlignRight, Text: "CompletedAt"},
+		},
 	}
+
+	var cells [][]*simpletable.Cell
+
+	for idx, item := range *t {
+		idx++
+		cells = append(cells, []*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", idx)},
+			{Text: item.Task},
+			{Text: fmt.Sprintf("%t", item.Done)},
+			{Text: item.CreatedAt.Format(time.RFC822)},
+			{Text: item.CompletedAt.Format(time.RFC822)},
+		})
+	}
+
+	table.Body = &simpletable.Body{Cells: cells}
+
+	table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+		{Align: simpletable.AlignCenter, Span: 5, Text: "Your todos are here"},
+	}}
+
+	table.SetStyle(simpletable.StyleUnicode)
+
+	table.Println()
 }
