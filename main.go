@@ -5,10 +5,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/illus1ons/todo-go/model"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/illus1ons/todo-go/todo"
 )
 
 const (
@@ -22,7 +23,7 @@ func main() {
 	list := flag.Bool("list", false, "TODO 전체 목록")
 	flag.Parse()
 
-	todos := &model.Todos{}
+	todos := &todo.Todos{}
 
 	if err := todos.Load(todoFile); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
