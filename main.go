@@ -17,10 +17,11 @@ const (
 )
 
 func main() {
-	add := flag.Bool("add", false, "TODO 추가")
-	complete := flag.Int("complete", 0, "TODO 완료 표시")
-	del := flag.Int("del", 0, "TODO 삭제")
-	list := flag.Bool("list", false, "TODO 전체 목록")
+	add := flag.Bool("add", false, "할 일 추가")
+	complete := flag.Int("complete", 0, "할 일 완료 표시")
+	del := flag.Int("del", 0, "할 일 삭제")
+	list := flag.Bool("list", false, "할 일 전체 목록")
+  deleteAll := flag.Bool("deleteAll", false, "할 일 전체 삭제")
 	flag.Parse()
 
 	todos := &todo.Todos{}
@@ -61,12 +62,24 @@ func main() {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
 		}
-
 		err = todos.Store(todoFile)
 		if err != nil {
 			fmt.Fprintln(os.Stdout, err.Error())
 			os.Exit(1)
 		}
+
+  case *deleteAll:
+     err := todos.DeleteAll()
+     if err != nil {
+      fmt.Fprintln(os.Stderr, err.Error())
+      os.Exit(1)
+    }
+		err = todos.Store(todoFile)
+		if err != nil {
+			fmt.Fprintln(os.Stdout, err.Error())
+			os.Exit(1)
+		}
+
 	case *list:
 		todos.Print()
 	default:

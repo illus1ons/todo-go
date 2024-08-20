@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -54,18 +53,23 @@ func (t *Todos) Delete(index int) error {
 	return nil
 }
 
+func (t *Todos) DeleteAll()  error {
+  *t = nil
+  return nil
+}
+
 func (t *Todos) Load(filename string) error {
-	file, err := ioutil.ReadFile(filename)
+	file, err := os.ReadFile(filename)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil
 		}
-		return err
-	}
+    return err
+  }
 
-	if len(file) == 0 {
-		return err
-	}
+  if len(file) == 0 {
+    return err 
+  }
 
 	err = json.Unmarshal(file, t)
 	if err != nil {
@@ -81,7 +85,7 @@ func (t *Todos) Store(filename string) error {
 		return err
 	}
 
-	return ioutil.WriteFile(filename, data, 0644)
+	return os.WriteFile(filename, data, 0644)
 }
 
 func (t *Todos) Print() {
@@ -90,10 +94,10 @@ func (t *Todos) Print() {
 	table.Header = &simpletable.Header{
 		Cells: []*simpletable.Cell{
 			{Align: simpletable.AlignCenter, Text: "#"},
-			{Align: simpletable.AlignCenter, Text: "Task"},
-			{Align: simpletable.AlignCenter, Text: "Done"},
-			{Align: simpletable.AlignCenter, Text: "CreatedAt"},
-			{Align: simpletable.AlignCenter, Text: "CompletedAt"},
+			{Align: simpletable.AlignCenter, Text: "할일"},
+			{Align: simpletable.AlignCenter, Text: "완료"},
+			{Align: simpletable.AlignCenter, Text: "생성일시"},
+			{Align: simpletable.AlignCenter, Text: "완료일시"},
 		},
 	}
 
@@ -121,7 +125,7 @@ func (t *Todos) Print() {
 	table.Body = &simpletable.Body{Cells: cells}
 
 	table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
-		{Align: simpletable.AlignCenter, Span: 5, Text: red(fmt.Sprintf("You have %d pending todos", t.CountPending()))},
+		{Align: simpletable.AlignCenter, Span: 5, Text: red(fmt.Sprintf("%d 개의 할 일이 남아있습니다.", t.CountPending()))},
 	}}
 
 	table.SetStyle(simpletable.StyleUnicode)
